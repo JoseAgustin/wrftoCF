@@ -1,7 +1,6 @@
-#
 #   wrftoCF
 
-THis repository is for the wrf_to_CF.ncl script modified for WRF-chem
+This repository is for the wrf_to_CF.ncl script modified for WRF-chem\n
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; wrfout_to_cf.ncl
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -9,8 +8,9 @@ THis repository is for the wrf_to_CF.ncl script modified for WRF-chem
 ;  grid and to output unstaggered values in NetCDF CF compliant format.
 ; -Extensive help in maintaining and adding to the script was provide by
 ;  Matt Higgins.
-the updathe of the original script from 
+this is an update from the original script from 
 Mark Seefeldt - mark.seefeldt@colorado.edu
 
+in order to include some chemical variables and ACDD compatible.
 NCL SCRIPT
 # wrftoCF
