@@ -200,55 +200,6 @@ begin
   ;MissingValue               = -999999   ;missing value
   ; Note: MissingValue is currently assigned in the procedure assignVarAttCoord
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ; set the netcdf file global attributes
-  fileAtt                 = True
-  fileAtt@standard_parallel=(/17.5,29.5/)
-  fileAtt@grid_mapping_name="lambert_conformal_conic"
-  fileAtt@date_issued     =  systemfunc("date +%Y'-'%m'-'%d' '%H':'%M':00'")
-  fileAtt@date_created    =  systemfunc("date -u +%Y'-'%m'-'%d' '%H':'%M':00Z'")
-  fileAtt@date_modified   =  systemfunc("date  +%Y'-'%m'-'%d' '%H':'%M':00Z'")
-;  fileAtt@time_coverage_end=systemfunc("date -d "4 days " +%Y'-'%m'-'%d' 00:00:00Z'")
-  fileAtt@time_coverage_end=systemfunc("date -v+4d +%Y'-'%m'-'%d' '%H':'%M':00Z'")
-  fileAtt@time_coverage_start=systemfunc("date +%Y'-'%m'-'%d' '%H':'%M':00Z'")
-  fileAtt@product_version="1.0"
-  fileAtt@processing_level="Level 1"
-  fileAtt@license= "Freely Distributed"
-  fileAtt@time_coverage_duration="P3D"
-  fileAtt@time_coverage_resolution="PT1H"
-  fileAtt@geospatial_bounds="POLYGON ((-100.013 17.7289,-100.013 30.7114,-85.1867 30.7114, -85.1867 17.7289))"
-  fileAtt@geospatial_vertical_positive="up"
-  fileAtt@geospatial_bounds_crs="EPSG:4979"
-  fileAtt@geospatial_vertical_resolution="20 meters"
-  fileAtt@geospatial_vertical_min= 0
-  fileAtt@geospatial_vertical_units="m"
-  fileAtt@geospatial_lat_units= "degrees_north"
-  fileAtt@geospatial_lon_units = "degrees_east"
-  fileAtt@publisher_type="institution"
-  fileAtt@publisher_url   = "http://smid.cigom.org"
-  fileAtt@publisher_email = "smid@cigom.org"
-  fileAtt@publisher_name  = "Sistema de Manejo Integral de Datos CIGOM"
-  fileAtt@standard_name_vocabulary = "CF Standard Name Table"
-  fileAtt@institution1    = "University of Colorado at Boulder - CIRES"
-  fileAtt@created_by = "Mark Seefeldt - mark.seefeldt@colorado.edu" 
-  fileAtt@creator_url="www.atmosfera.unam.mx"
-  fileAtt@creator_email="victor.almanza@atmosfera.unam.mx;agustin@atmosfera.unam.mx"
-  fileAtt@creator_name= "Victor Almzanza;Agustin Garcia"
-  fileAtt@creator_institution = "Universidad Nacional Autonoma de Mexico - CCA"
-  fileAtt@creator_type="institution"
-  fileAtt@comment = "Created with NCL script:  wrfout_to_cf.ncl v2.0.2"
-  fileAtt@source         = file_in
-  fileAtt@Conventions    = "CF-1.6, Standard Name Table v19,ACDD-1.3"
-  fileAtt@contributor_role = "Investigador;Investigador;Investigador"
-  fileAtt@contributor_name = "Cuauhtemoc Turrent, turrentc@cicese.mc; Agustin Garcia, agustin@atmosfera.unam.mx; Victor Almanza, victor.almanza@atmosfera.unam.mx"
-  fileAtt@acknowledgment= "CICESE; CCA-UNAM"
-  fileAtt@keywords_vocabulary="CF:NetCDF COARDS Climate and Forecast Standard Names"
-  fileAtt@keywords       = "WRF-chem,air pollutants,ozone,SO2,NOx,PM10,CIGOM"
-  fileAtt@summary        = "Air quality forecast for Gulf of Mexico using WRF-chem and EI 2013, NEI2011, 72 hrs"
-  fileAtt@naming_authority="cigom.org"
-  fileAtt@institution    ="CIGOM;UNAM"
-  fileAtt@project        ="Consorcio de Investigacion del Golfo de Mexico"
-  fileAtt@cdm_data_type  ="Grid"
-  fileAtt@id ="regulargrid-dataset-sample"
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ; time / date variables
   outDateTime                = True      ;include a yyyymmddhh field
@@ -454,7 +405,7 @@ begin
   ; -convert the wrfout time to a CF compliant time
   ;  "hours since 1901-01-01 00:00:00"
   time_in = wrf_times_c(TimeChar, 1) 
-  ; -create an array indicating the year, month, m,, hour, minute, second
+  ; -create an array indicating the year, month, day, hour, minute, second
   utc_date = floattoint(ut_calendar(time_in, 0))
   ; -create the final variable for time with the units selected
   time = ut_inv_calendar(utc_date(:,0), utc_date(:,1), utc_date(:,2),  \
@@ -560,6 +511,8 @@ begin
     else
       p_top = p_top_in(0)
     end if
+    p_top@featureType="point"
+    p_top@coverage_content_type="referenceInformation"
     p_top@long_name = "Pressure at upper boundary of the top layer of an atmosphere model"
     p_top@standard_name = "air_pressure_at_top_of_atmosphere_model"
     p_top@units = "hPa"
@@ -635,6 +588,7 @@ begin
       p_sfc_temp = wrfout->PSFC                                    ;p_sfc
         p_sfc = p_sfc_temp/100.
         ;delete_VarAtts(p_sfc,-1)  ;not needed as calc removes atts
+        p_sfc@coverage_content_type="modelResult"
         p_sfc@long_name = "Pressure at the Surface"
         p_sfc@standard_name = "surface_air_pressure"
         p_sfc@units = "hPa"
@@ -699,6 +653,7 @@ begin
     if (out2dMet@u_10m_gr) then
       u_10m_gr = wrfout->U10                                       ;u_10m_gr
         delete_VarAtts(u_10m_gr,-1)
+        u_10m_gr@coverage_content_type="modelResult"
         u_10m_gr@long_name = "u-Component of Wind at 10 m (grid)"
         u_10m_gr@standard_name = "eastward_wind"
         u_10m_gr@units = "m s-1"
@@ -707,6 +662,7 @@ begin
     if (out2dMet@v_10m_gr) then
       v_10m_gr = wrfout->V10                                       ;v_10m_gr
         delete_VarAtts(v_10m_gr,-1)
+        v_10m_gr@coverage_content_type="modelResult"
         v_10m_gr@long_name = "v-Component of Wind at 10 m (grid)"
         v_10m_gr@standard_name = "northward_wind"
         v_10m_gr@units = "m s-1"
@@ -730,6 +686,7 @@ begin
         assignVarAttCoord(v_10m_tr,time,0,0)
       if (out2dMet@ws_10m)
         ws_10m = sqrt(u_10m_tr^2 + v_10m_tr^2)                     ;ws_10m
+          ws_10m@coverage_content_type="modelResult"
           ws_10m@long_name = "Wind Speed at 10 m"
           ws_10m@standard_name = "wind_speed"
           ws_10m@units = "m s-1"
@@ -738,6 +695,7 @@ begin
       if (out2dMet@wd_10m)                                         ;wd_10m
         r2d = 45.0/atan(1.0)
         wd_10m = atan2(u_10m_tr, v_10m_tr) * r2d + 180.
+          wd_10m@coverage_content_type="modelResult"
           wd_10m@long_name = "Wind Direction at 10 m"
           wd_10m@standard_name = "wind_from_direction"
           wd_10m@units = "degree"
@@ -805,6 +763,7 @@ begin
     if (out2dMet@pblh) then
       pblh = wrfout->PBLH                                          ;pblh
         delete_VarAtts(pblh,-1)
+        pblh@coverage_content_type="modelResult"
         pblh@long_name = "PBL Height"
         pblh@standard_name = "atmosphere_boundary_layer_thickness"
         pblh@units = "m"
@@ -1893,6 +1852,7 @@ begin
     if (out2dLandSoil@LandMask) then
       LandMask = wrfout->LANDMASK      ;land mask (1 - land, 0 - water)
         delete_VarAtts(LandMask,-1)
+        LandMask@coverage_content_type="auxiliaryInformation"
         LandMask@long_name = "Land Mask"
         LandMask@standard_name = "land_binary_mask"
         LandMask@units = ""
@@ -1902,6 +1862,7 @@ begin
     if (out2dLandSoil@LandUse) then
       LandUse = wrfout->LU_INDEX       ;land use category
         delete_VarAtts(LandUse,-1)
+        LandUse@coverage_content_type="auxiliaryInformation"
         LandUse@long_name = "Land Use Category"
         LandUse@standard_name = "area_type"
         LandUse@units = "1"
@@ -2059,7 +2020,9 @@ begin
    if (outChem) then
      if (outChem@ChemCO) then
       ChemCO = wrfout->co
-      ChemCO = ChemCO/1e6        ;CO concentration ppm to fraction
+      ChemCO = ChemCO*1.0  ; concentration from ppm to ppm
+      ChemCO@scale_factor=1.E-6 ; concentration from ppm to mole fraction
+      ChemCO@add_offset=0.0
       ChemCO@coverage_content_type="modelResult"
       ChemCO@long_name = "CO Concentration"
       ChemCO@standard_name = "mole_fraction_of_carbon_monoxide_in_air"
@@ -2068,7 +2031,9 @@ begin
      end if
      if (outChem@ChemCO2) then
       ChemCO2 = wrfout->co2
-      ChemCO2 =ChemCO2/1e6         ;CO2 concentration ppm to fraction
+      ChemCO2 =ChemCO2*1.           ;CO2 concentration in ppm
+      ChemCO2@scale_factor=1.E-6 ; concentration from ppm to mole fraction
+      ChemCO2@add_offset=0.0
       ChemCO2@coverage_content_type="modelResult"
       ChemCO2@long_name = "Carbon dioxide Concentration"
       ChemCO2@standard_name = "mole_fraction_of_carbon_dioxide_in_air"
@@ -2077,7 +2042,9 @@ begin
      end if
      if (outChem@ChemHCHO) then
       ChemHCHO = wrfout->hcho
-      ChemHCHO = ChemHCHO/1e6         ;HCHO concentration ppm to fraction
+      ChemHCHO = ChemHCHO*1000.  ; concentration from ppm to ppb
+      ChemHCHO@scale_factor=1.E-9 ; concentration from ppb to mole fraction
+      ChemHCHO@add_offset=0.0
       ChemHCHO@coverage_content_type="modelResult"
       ChemHCHO@long_name = "Formaldehyde Concentration"
       ChemHCHO@standard_name = "mole_fraction_of_formaldehyde_in_air"
@@ -2086,7 +2053,9 @@ begin
      end if
      if (outChem@ChemHNO3) then
       ChemHNO3 = wrfout->hno3
-      ChemHNO3 = ChemHNO3/1e6         ;HNO3 concentration ppm to fraction
+      ChemHNO3 = ChemHNO3*1000.  ; concentration from ppm to ppb
+      ChemHNO3@scale_factor=1.E-9 ; concentration from ppb to mole fraction
+      ChemHNO3@add_offset=0.0
       ChemHNO3@coverage_content_type="modelResult"
       ChemHNO3@long_name = "Nitric Acid Concentration"
       ChemHNO3@standard_name = "mole_fraction_of_nitric_acid_in_air"
@@ -2095,7 +2064,9 @@ begin
      end if
      if (outChem@ChemNH3) then
       ChemNH3 =wrfout->nh3
-      ChemNH3 =ChemNH3/1e6         ;NH3 concentration ppm to fraction
+      ChemNH3 =ChemNH3*1000.  ; concentration from ppm to ppb
+      ChemNH3@scale_factor=1.E-9 ; concentration from ppb to mole fraction
+      ChemNH3@add_offset=0.0
       ChemNH3@coverage_content_type="modelResult"
       ChemNH3@long_name = "Ammonia Concentration"
       ChemNH3@standard_name = "mole_fraction_of_ammonia_in_air"
@@ -2104,7 +2075,9 @@ begin
      end if
      if (outChem@ChemNO) then
       ChemNO = wrfout->no
-      ChemNO = ChemNO/1e6         ;NO concentration ppm to fraction
+      ChemNO = ChemNO*1000.  ; concentration from ppm to ppb
+      ChemNO@scale_factor=1.E-9 ; concentration from ppb to mole fraction
+      ChemNO@add_offset=0.0
       ChemNO@coverage_content_type="modelResult"
       ChemNO@long_name = "NO Concentration"
       ChemNO@standard_name = "mole_fraction_of_nitrogen_monoxide_in_air"
@@ -2113,7 +2086,9 @@ begin
      end if
      if (outChem@ChemNO2) then
       ChemNO2 = wrfout->no2
-      ChemNO2 = ChemNO2/1e6         ;NO2 concentration ppm to fraction
+      ChemNO2 = ChemNO2*1000.  ; concentration from ppm to ppb
+      ChemNO2@scale_factor=1.E-9 ; concentration from ppb to mole fraction
+      ChemNO2@add_offset=0.0
       ChemNO2@coverage_content_type="modelResult"
       ChemNO2@long_name = "Nitrogen dioxide Concentration"
       ChemNO2@standard_name = "mole_fraction_of_nitrogen_dioxide_in_air"
@@ -2122,7 +2097,9 @@ begin
      end if
      if (outChem@ChemNO3) then
       ChemNO3 = wrfout->no3
-      ChemNO3 = ChemNO3/1e6         ;NO3 concentration ppm to fraction
+      ChemNO3 = ChemNO3*1000.  ; concentration from ppm to ppb
+      ChemNO3@scale_factor=1.E-9 ; concentration from ppb to mole fraction
+      ChemNO3@add_offset=0.0
       ChemNO3@coverage_content_type="modelResult"
       ChemNO3@long_name = "Nitrogen trioxide Concentration"
       ChemNO3@standard_name = "mole_fraction_of_nitrogen_trioxide_in_air"
@@ -2131,7 +2108,9 @@ begin
      end if
      if (outChem@ChemOH) then
       ChemOH = wrfout->ho
-      ChemOH = ChemOH/1e6         ;OH concentration ppm to fraction
+      ChemOH = ChemOH*1000.  ; concentration from ppm to ppb
+      ChemOH@scale_factor=1.E-9 ; concentration ppb to fraction
+      ChemOH@add_offset=0.0
       ChemOH@coverage_content_type="modelResult"
       ChemOH@long_name = "Hidroxyl radical Concentration"
       ChemOH@standard_name = "mole_fraction_of_hydroxyl_in_air"
@@ -2149,7 +2128,9 @@ begin
      end if
      if (outChem@ChemOzon) then
       ChemOzon = wrfout->o3
-      ChemOzon = ChemOzon/1e6     ;ozone concentration ppm to fraction
+      ChemOzon = ChemOzon*1000.  ; concentration from ppm to ppb
+      ChemOzon@scale_factor=1.E-9 ; concentration ppb to fraction
+      ChemOzon@add_offset=0.0
       ChemOzon@coverage_content_type="modelResult"
       ChemOzon@long_name = "Ozone Concentration"
       ChemOzon@standard_name = "mole_fraction_of_o3_in_air"
@@ -2158,7 +2139,9 @@ begin
      end if
      if (outChem@ChemSO2) then
       ChemSO2 = wrfout->so2
-      ChemSO2 = ChemSO2/1e6       ;SO2 concentration ppm to fraction
+      ChemSO2 = ChemSO2*1000.  ; concentration from ppm to ppb
+      ChemSO2@scale_factor=1.E-9 ; concentration from ppb to mole fraction
+      ChemSO2@add_offset=0.0
       ChemSO2@coverage_content_type="modelResult"
       ChemSO2@long_name = "Sulfur Dioxide Concentration"
       ChemSO2@standard_name = "mole_fraction_of_sulfur_dioxide_in_air"
@@ -2167,7 +2150,9 @@ begin
      end if
      if (outChem@ChemPM10) then
       ChemPM10 = wrfout->PM10
-      ChemPM10 = ChemPM10/1e9   ;PM10 concentration ug/m-3 to kg/m-3
+      ChemPM10 = ChemPM10*1.   ;PM10 concentration in ug/m-3
+      ChemPM10@scale_factor=1.E-9 ; concentration from ug/m-3 to kg/m-3
+      ChemPM10@add_offset=0.0
       ChemPM10@coverage_content_type="modelResult"
       ChemPM10@long_name = "PM10 ambient concentration "
       ChemPM10@standard_name = "mass_concentration_of_pm10_ambient_aerosol_particles_in_air"
@@ -2176,7 +2161,8 @@ begin
      end if
      if (outChem@ChemPM25) then
       ChemPM25 = wrfout->PM2_5_DRY
-      ChemPM25 = ChemPM25/1e9    ;PM2.5 concentration ug/m-3 to kg/m-3
+      ChemPM25 = ChemPM25*1.   ;PM10 concentration in ug/m-3
+      ChemPM25@scale_factor=1.E-9 ; concentration from ug/m-3 to kg/m-3
       ChemPM25@coverage_content_type="modelResult"
       ChemPM25@long_name = "PM2.5 ambient concentration"
       ChemPM25@standard_name = "mass_concentration_of_pm2p5_ambient_aerosol_particles_in_air"
@@ -2185,9 +2171,11 @@ begin
      end if
      if (outChem@ChemNOX) then
       ChemNOX = wrfout->nox
-      ChemNOX = ChemNOX/1e6      ;NOx concentration ppmv to mole fraction
-      ChemNOX@coverage_content_type="modelResult"
+      ChemNOX = ChemNOX*1000.  ; concentration from ppm to ppb
       delete_VarAtts(ChemNOX,-1)
+      ChemNOX@scale_factor=1.E-9 ; concentration from ppb to mole fraction
+      ChemNOX@add_offset=0.0
+      ChemNOX@coverage_content_type="modelResult"
       ChemNOX@long_name = "NOx Concentration"
       ChemNOX@standard_name = "mole_fraction_of_nox_expressed_as_nitrogen_in_air"
       ChemNOX@units = "1"
@@ -2402,7 +2390,7 @@ begin
   end if
   ;create filename and open post-processed netCDF file
   if (fileNetCDF4Classic) then               ; set netcdf4 fileoption
-    setfileoption("nc","Format","NetCDF4")
+    setfileoption("nc","Format","NetCDF4Classic")
   end if
   if isfilepresent(dir_out+file_out) then
     system ("rm "+dir_out+file_out)          ;remove any pre-exisiting file
@@ -2412,16 +2400,74 @@ begin
   ; establish a variable for a new line in the attributes
   nl = integertochar(10)  ; newline character
   ; create the global attributes
+
+;=================== moved from the beginnning to here  
+ ; set the netcdf file global attributes
+  fileAtt                 = True
+  fileAtt@license= "Freely Distributed"
+  fileAtt@date_issued     =  systemfunc("date -u +%Y'-'%m'-'%d'T'%H':'%M':00Z'")
+  fileAtt@date_created    =  systemfunc("date -u +%Y'-'%m'-'%d'T'%H':'%M':00Z'")
+  fileAtt@date_modified   =  systemfunc("date -u +%Y'-'%m'-'%d'T'%H':'%M':00Z'")
+  fileAtt@date_metadata_modified=  systemfunc("date -u +%Y'-'%m'-'%d'T'%H':'%M':00Z'")
   fileAtt@history   = wrfout@history
+  fileAtt@time_coverage_end=systemfunc("date -d '4 days' +%Y'-'%m'-'%d'T00:00:00Z'")
+;  fileAtt@time_coverage_end=systemfunc("date -v+4d +%Y'-'%m'-'%d'T'%H':'%M':00Z'")
+  fileAtt@time_coverage_start=systemfunc("date +%Y'-'%m'-'%d'T'%H':'%M':00Z'")
+  fileAtt@product_version="1.0"
+  fileAtt@processing_level="Level 1"
+  fileAtt@time_coverage_duration="P3D"
+  fileAtt@time_coverage_resolution="PT1H"
+  fileAtt@standard_parallel=(/17.5,29.5/)
+  fileAtt@grid_mapping_name="lambert_conformal_conic"
+  fileAtt@geospatial_bounds="POLYGON (("+min(lat)+" "+min(lon)+","+max(lat)+" "+min(lon)+ ","+max(lat)+" "+max(lon)+","+min(lat)+" "+max(lon)+"))"
+  fileAtt@geospatial_vertical_positive="up"
+  fileAtt@geospatial_bounds_vertical_crs="EPSG:5703"
+  fileAtt@geospatial_bounds_crs="EPSG:4979"
+  fileAtt@geospatial_vertical_resolution="20 meters"
+  fileAtt@geospatial_vertical_min= 0
   fileAtt@geospatial_vertical_max=max(Z_sfc)
-  fileAtt@geospatial_lon_min=min(lon)
-  fileAtt@geospatial_lon_max=max(lon)
+  fileAtt@geospatial_vertical_units="m"
+  fileAtt@geospatial_lat_resolution= wrfout@DY + " meters"
+  fileAtt@geospatial_lon_resolution= wrfout@DX + " meters"
+  fileAtt@geospatial_lon_min=min(lon)  ;esto es solo para Golfo
+  fileAtt@geospatial_lon_max= max(lon)
   fileAtt@geospatial_lat_max=max(lat)
   fileAtt@geospatial_lat_min=min(lat)
-  fileAtt@geospatial_lat_resolution=wrfout@DY +" meters"
-  fileAtt@geospatial_lon_resolution=wrfout@DX +" meters"
-  fileAtt@title          = "Pronostico numerico de calidad del aire a 72 hrs"+nl+ wrfout@TITLE
+  fileAtt@geospatial_lat_units= "degrees_north"
+  fileAtt@geospatial_lon_units = "degrees_east"
+  fileAtt@publisher_type="institution"
+  fileAtt@publisher_institution="Centro de Investigación Científica y de Educación Superior de Ensenada, Baja California, Mexico"
+  fileAtt@publisher_url   = "http://smid.cigom.org"
+  fileAtt@publisher_email = "smid@cigom.org"
+  fileAtt@publisher_name  = "Sistema de Manejo Integral de Datos CIGOM"
+  fileAtt@standard_name_vocabulary = "CF Standard Name Table"
+  fileAtt@institution1    = "University of Colorado at Boulder - CIRES"
+  fileAtt@created_by = "Mark Seefeldt - mark.seefeldt@colorado.edu" 
+  fileAtt@creator_url="https://www.cicese.edu.mx"
+  fileAtt@creator_email="victor.almanza@atmosfera.unam.mx;agustin@atmosfera.unam.mx"
+  fileAtt@creator_name= "Victor Almzanza;Agustin Garcia"
+  fileAtt@creator_institution = "Centro de Investigación Cientifica y de Educacion Superior de Ensenada, Baja California, Mexico"
+  fileAtt@creator_type="institution"
+  fileAtt@comment = "Created with NCL script:  wrfout_to_cf.ncl v2.0.2"
+  fileAtt@source         = file_in
+  fileAtt@Conventions    = "CF-1.6, Standard Name Table v19,ACDD-1.3"
+  fileAtt@contributor_role = "Investigador;Investigador;Investigador"
+  fileAtt@contributor_name = "Cuauhtemoc Turrent, turrentc@cicese.mc; Agustin Garcia, agustin@atmosfera.unam.mx; Victor Almanza, victor.almanza@atmosfera.unam.mx"
+  fileAtt@acknowledgment= "CICESE; CCA-UNAM"
+  fileAtt@keywords_vocabulary="CF:NetCDF COARDS Climate and Forecast Standard Names"
+  fileAtt@keywords       = "WRF-chem,ozone,SO2,NOx,PM10,NH3,NO2,NO,CO"
+  fileAtt@summary        = "Air quality forecast for Gulf of Mexico using WRF-chem and EI 2013, NEI2011, 72 hrs"
+  fileAtt@program        ="CIGOM"
+  fileAtt@naming_authority="cigom.org"
+  fileAtt@institution    ="CIGOM;UNAM"
+  fileAtt@project        ="Consorcio de Investigacion del Golfo de Mexico"
+  fileAtt@cdm_data_type  ="Grid"
+  fileAtt@id ="regulargrid-dataset-sample"
+  fileAtt@title          = "Pronostico numerico de calidad del aire a 72 hrs"+nl+wrfout@TITLE
+;==========================================================================================
+
   fileattdef(wrfpost, fileAtt)
+
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;; write post-processed WRF data to netCDF file ;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
