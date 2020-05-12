@@ -13,4 +13,8 @@ Mark Seefeldt - mark.seefeldt@colorado.edu
 
 in order to include some chemical variables and ACDD compatible.
 NCL SCRIPT
+
+the original file was obtained from:
+
+https://sundowner.colorado.edu/wrfout_to_cf/overview.html
 # wrftoCF
