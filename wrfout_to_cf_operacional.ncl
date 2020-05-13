@@ -2417,7 +2417,7 @@ begin
   fileAtt@processing_level="Level 1"
   fileAtt@time_coverage_duration="P3D"
   fileAtt@time_coverage_resolution="PT1H"
-  fileAtt@standard_parallel=(/17.5,29.5/)
+  fileAtt@standard_parallel=(/wrfout@TRUELAT1,wrfout@TRUELAT2/)
   fileAtt@grid_mapping_name="lambert_conformal_conic"
   fileAtt@geospatial_bounds="POLYGON (("+min(lat)+" "+min(lon)+","+max(lat)+" "+min(lon)+ ","+max(lat)+" "+max(lon)+","+min(lat)+" "+max(lon)+"))"
   fileAtt@geospatial_vertical_positive="up"
@@ -2445,7 +2445,7 @@ begin
   fileAtt@created_by = "Mark Seefeldt - mark.seefeldt@colorado.edu" 
   fileAtt@creator_url="https://www.cicese.edu.mx"
   fileAtt@creator_email="victor.almanza@atmosfera.unam.mx;agustin@atmosfera.unam.mx"
-  fileAtt@creator_name= "Victor Almzanza;Agustin Garcia"
+  fileAtt@creator_name= "Victor Almanza;Agustin Garcia"
   fileAtt@creator_institution = "Centro de Investigación Cientifica y de Educacion Superior de Ensenada, Baja California, Mexico"
   fileAtt@creator_type="institution"
   fileAtt@comment = "Created with NCL script:  wrfout_to_cf.ncl v2.0.2"
