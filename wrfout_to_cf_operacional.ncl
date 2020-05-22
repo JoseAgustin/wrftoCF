@@ -2410,8 +2410,8 @@ begin
   fileAtt@date_modified   =  systemfunc("date -u +%Y'-'%m'-'%d'T'%H':'%M':00Z'")
   fileAtt@date_metadata_modified=  systemfunc("date -u +%Y'-'%m'-'%d'T'%H':'%M':00Z'")
   fileAtt@history   = wrfout@history
-  fileAtt@time_coverage_end=systemfunc("date -d '4 days' +%Y'-'%m'-'%d'T00:00:00Z'")
-;  fileAtt@time_coverage_end=systemfunc("date -v+4d +%Y'-'%m'-'%d'T'%H':'%M':00Z'")
+;  fileAtt@time_coverage_end=systemfunc("date -d '4 days' +%Y'-'%m'-'%d'T00:00:00Z'")
+  fileAtt@time_coverage_end=systemfunc("date -v+4d +%Y'-'%m'-'%d'T'%H':'%M':00Z'")
   fileAtt@time_coverage_start=systemfunc("date +%Y'-'%m'-'%d'T'%H':'%M':00Z'")
   fileAtt@product_version="1.0"
   fileAtt@processing_level="Level 1"
@@ -2462,7 +2462,7 @@ begin
   fileAtt@institution    ="CIGOM;UNAM"
   fileAtt@project        ="Consorcio de Investigacion del Golfo de Mexico"
   fileAtt@cdm_data_type  ="Grid"
-  fileAtt@id ="regulargrid-dataset-sample"
+  fileAtt@id ="CIGOM:AQ_Forecast_"+systemfunc("date -u +%Y'-'%m'-'%d'T'%H':'%M':00Z'")
   fileAtt@title          = "Pronostico numerico de calidad del aire a 72 hrs"+nl+wrfout@TITLE
 ;==========================================================================================
 
